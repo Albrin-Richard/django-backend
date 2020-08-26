@@ -52,7 +52,7 @@ class Event(models.Model):
         Device,
         blank=True,
         null=True,
-        on_delete=models.DO_NOTHING
+        on_delete=models.CASCADE
     )
 
     # object_type = models.CharField(

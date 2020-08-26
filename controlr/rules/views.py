@@ -34,7 +34,7 @@ class TimerViewSet(viewsets.ModelViewSet):
         timer_schedule.add_timer(
             timer_id=timer.id,
             device_id=data['device'],
-            state=data['state_change'],
+            state_change=data['state_change'],
             time_delta=time_delta
         )
 

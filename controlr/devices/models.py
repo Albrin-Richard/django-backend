@@ -9,6 +9,7 @@ class Device(models.Model):
         max_length=UNIQUE_ID_LENGTH,
         null=True,
         blank=False,
+        unique=True
     )
 
     name = models.CharField(
@@ -28,7 +29,7 @@ class Device(models.Model):
 
     building = models.ForeignKey(
         Building,
-        related_name='buildings',
+        related_name='devices',
         on_delete=models.CASCADE,
         null=True,
         blank=False

@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from controlr.devices.models import DeviceState
-from ..apps import schedule_schedule
+from controlr.core.scheduler import schedule_sched
 from django.utils import timezone
 from ..models import Timer
 
@@ -8,10 +8,7 @@ from ..models import Timer
 def add_schedule(schedule_id, device_id, state_change, days_of_week, hour, minute):
     days_of_week_str = ','.join(map(str, days_of_week))
 
-    print('Schedule Added')
-    for i in schedule_schedule.get_jobs():
-        print(i)
-    return schedule_schedule.add_job(
+    return schedule_sched.add_job(
         switch_device_state,
         trigger='cron',
         day_of_week=days_of_week_str,
@@ -24,19 +21,16 @@ def add_schedule(schedule_id, device_id, state_change, days_of_week, hour, minut
 
 def remove_schedule(schedule_id):
     schedule_id = str(schedule_id)
-    if (schedule_schedule.get_job(schedule_id)):
-        schedule_schedule.remove_job(schedule_id)
+    if (schedule_sched.get_job(schedule_id)):
+        schedule_sched.remove_job(schedule_id)
 
 
 def switch_device_state(device_id, state_change):
-    print(device_id)
     DeviceState.objects.filter(device_id=device_id).update(state=state_change)
 
 
 def switch_schedule_state(schedule_id, state_change):
-    for i in schedule_schedule.get_jobs():
-        print(i)
     if (state_change):
-        schedule_schedule.resume_job(str(schedule_id))
+        schedule_sched.resume_job(str(schedule_id))
     elif not (state_change):
-        schedule_schedule.pause_job(str(schedule_id))
+        schedule_sched.pause_job(str(schedule_id))

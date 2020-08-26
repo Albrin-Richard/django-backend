@@ -17,7 +17,8 @@ class EventViewSet(viewsets.ModelViewSet):
         # start_date = request.query_params['start_date'] or None
         # end_date = request.query_params['end_date'] or None
 
-        queryset = Event.objects.filter(building_id=kwargs['id'])
+        queryset = Event.objects.filter(
+            building_id=kwargs['id']).order_by('timestamp')
 
         # if device_id:
         #     queryset = queryset.filter(object_id=device_id)

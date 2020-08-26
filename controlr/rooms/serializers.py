@@ -27,7 +27,7 @@ class RoomListSerializer(serializers.ModelSerializer):
         return obj.devices.count()
 
     def get_num_devices_on(self, obj):
-        return obj.devices.filter(id__in=obj.devices.all()).filter(state__state=True).count()
+        return obj.devices.filter(state__state=True).count()
 
 
 class RoomGroupSerializer(serializers.ModelSerializer):
@@ -36,3 +36,12 @@ class RoomGroupSerializer(serializers.ModelSerializer):
         model = RoomGroup
         fields = ['id', 'name', 'building']
         read_only_fields = ['building']
+
+
+class CurrentStatsSerializer(serializers.Serializer):
+    room_id = serializers.IntegerField()
+    room_name = serializers.CharField()
+    num_devices_on = serializers.IntegerField()
+    num_devices_total = serializers.IntegerField()
+    current_power_usage = serializers.DecimalField(
+        max_digits=5, decimal_places=2)

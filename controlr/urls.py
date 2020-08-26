@@ -25,4 +25,5 @@ urlpatterns = [
     path('v1/buildings/<int:id>/', include('controlr.devices.urls')),
     path('v1/buildings/<int:id>/', include('controlr.events.urls')),
     path('v1/buildings/<int:id>/', include('controlr.rules.urls')),
+    path('v1/buildings/<int:id>/', include('controlr.usage.urls')),
 ]
