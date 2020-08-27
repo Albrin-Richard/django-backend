@@ -5,6 +5,7 @@ from controlr.utils.helpers import get_minutes_from_td, get_total_minutes
 from controlr.devices.models import Device
 from django.db import connection
 from copy import deepcopy
+from datetime import timedelta
 
 
 def fetch_device_usage_timeseries(frequency, start_ts, end_ts, device_ids, building_id):
@@ -131,12 +132,28 @@ def get_device_usage_timeseries(building_id, device_ids, start_ts, end_ts, frequ
         )
     )))
 
-    for timestamp, value in fetch_device_usage_timeseries(frequency, start_ts, end_ts, device_ids, building_id):
+    device_usage_timeseries = fetch_device_usage_timeseries(
+        frequency, start_ts, end_ts, device_ids, building_id)
 
-        events_timeseries[timestamp] = {
+    device_usage_timeseries_dict = {}
+
+    for ts, value in device_usage_timeseries:
+        device_usage_timeseries_dict[ts] = value
+
+    datetime_itr = start_ts
+
+    while (datetime_itr < end_ts):
+
+        events_timeseries[datetime_itr] = {
             'events': [],
             'devices_previously_on': deepcopy(on_devices)
         }
+
+        if datetime_itr not in device_usage_timeseries_dict.keys():
+            datetime_itr += timedelta(**{f'{frequency}s': 1})
+            continue
+
+        value = device_usage_timeseries_dict[datetime_itr]
 
         events = value.split(',')
 
@@ -146,7 +163,7 @@ def get_device_usage_timeseries(building_id, device_ids, start_ts, end_ts, frequ
             state_change = values[1] == 'true'
             ts = datetime.strptime(values[2], '%Y-%m-%d %H:%M:%S+00')
 
-            events_timeseries[timestamp]['events'].append({
+            events_timeseries[datetime_itr]['events'].append({
                 'device_id': device_id,
                 'power': Device.objects.get(id=device_id).power,
                 'state_change': state_change,
@@ -159,10 +176,13 @@ def get_device_usage_timeseries(building_id, device_ids, start_ts, end_ts, frequ
             elif device_id in on_devices:
                 on_devices.remove(device_id)
 
+        datetime_itr += timedelta(**{f'{frequency}s': 1})
+
     usage_timeseries = {}
+    datetime_itr = start_ts
 
-    for ts, value in events_timeseries.items():
-
+    while (datetime_itr < end_ts):
+        value = events_timeseries[datetime_itr]
         devices_usage = {}
 
         for event in value['events']:
@@ -175,14 +195,14 @@ def get_device_usage_timeseries(building_id, device_ids, start_ts, end_ts, frequ
         for event in value['events']:
             if (event['state_change'] == True):
                 runtime_minutes = get_minutes_from_td(
-                    event['timestamp'].replace(tzinfo=pytz.UTC) - ts)
+                    event['timestamp'].replace(tzinfo=pytz.UTC) - datetime_itr)
                 devices_usage[event['device_id']]['runtime'] -= runtime_minutes
                 devices_usage[event['device_id']]['usage'] -= (
                     event['power']*runtime_minutes) / 60
 
             if (event['state_change'] == False):
                 runtime_minutes = get_minutes_from_td(
-                    event['timestamp'].replace(tzinfo=pytz.UTC) - ts)
+                    event['timestamp'].replace(tzinfo=pytz.UTC) - datetime_itr)
                 devices_usage[event['device_id']]['runtime'] += runtime_minutes
                 devices_usage[event['device_id']]['usage'] += event['power'] * \
                     runtime_minutes / 60
@@ -198,21 +218,37 @@ def get_device_usage_timeseries(building_id, device_ids, start_ts, end_ts, frequ
 
         devices_in_range = [device for device in devices_usage.keys()]
 
+        if datetime_itr + timedelta(**{f'{frequency}s': 1}) > end_ts:
+            total_minutes_temp = get_minutes_from_td(end_ts - datetime_itr)
+        else:
+            total_minutes_temp = total_minutes
+
         for device in list(value['devices_previously_on'].difference(devices_in_range)):
             device_power = Device.objects.get(id=device).power
             devices_usage[device] = {
                 'power': device_power,
-                'runtime': total_minutes,
-                'usage': (total_minutes * device_power) / 60
+                'runtime': total_minutes_temp,
+                'usage': (total_minutes_temp * device_power) / 60
             }
 
-        usage_timeseries[str(ts)] = {
+        usage_timeseries[datetime_itr] = {
             'usage': 0,
             'runtime': 0
         }
 
         for device_id, usage in devices_usage.items():
-            usage_timeseries[str(ts)]['usage'] += usage['usage']
-            usage_timeseries[str(ts)]['runtime'] += usage['runtime']
+            usage_timeseries[datetime_itr]['usage'] += usage['usage']
+            usage_timeseries[datetime_itr]['runtime'] += usage['runtime']
 
-    return usage_timeseries
+        datetime_itr += timedelta(**{f'{frequency}s': 1})
+
+    usage_timeseries_list = []
+
+    for ts, value in usage_timeseries.items():
+        usage_timeseries_list.append({
+            'timestamp': ts,
+            'usage': value['usage'],
+            'runtime': value['runtime']
+        })
+
+    return usage_timeseries_list

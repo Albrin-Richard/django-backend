@@ -7,6 +7,7 @@ from rest_framework import status
 from controlr.buildings.models import Group
 from controlr.rooms.models import Room
 from controlr.devices.models import Device
+from .serializers import DeviceUsageTimeseriesSerializer
 
 
 class DeviceUsageTotal(APIView):
@@ -108,4 +109,9 @@ class DeviceUsageTimeseries(APIView):
             frequency=frequency
         )
 
-        return Response(devices_usage, status=status.HTTP_200_OK)
+        serializer = DeviceUsageTimeseriesSerializer(
+            data=devices_usage, many=True)
+
+        serializer.is_valid()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)

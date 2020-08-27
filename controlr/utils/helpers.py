@@ -4,6 +4,7 @@ def get_minutes_from_td(timedelta):
 
 def get_total_minutes(time_period):
     switch = {
+        'minute': 1,
         'hour': 60,
         'day': 1440,
         'week': 10080,
