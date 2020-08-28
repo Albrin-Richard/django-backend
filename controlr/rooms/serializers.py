@@ -17,10 +17,11 @@ class RoomDetailSerializer(serializers.ModelSerializer):
 class RoomListSerializer(serializers.ModelSerializer):
     num_devices_total = serializers.SerializerMethodField()
     num_devices_on = serializers.SerializerMethodField()
+    room_group_name = serializers.CharField(source='room_group.name')
 
     class Meta:
         model = Room
-        fields = ['id', 'name', 'room_group',
+        fields = ['id', 'name', 'room_group', 'room_group_name',
                   'num_devices_total', 'num_devices_on']
 
     def get_num_devices_total(self, obj):
@@ -43,5 +44,4 @@ class CurrentStatsSerializer(serializers.Serializer):
     room_name = serializers.CharField()
     num_devices_on = serializers.IntegerField()
     num_devices_total = serializers.IntegerField()
-    current_power_usage = serializers.DecimalField(
-        max_digits=5, decimal_places=2)
+    current_power_usage = serializers.FloatField()

@@ -55,8 +55,7 @@ class RoomGroupList(
         building = Building.objects.get(id=kwargs['id'])
         serializer.save(building=building)
 
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class CurrentStatsView(APIView):
@@ -68,7 +67,7 @@ class CurrentStatsView(APIView):
         num_devices_total = DeviceState.objects.filter(
             device__room=room_id).count()
         current_power_usage = Device.objects.filter(
-            state=True, room=room_id).aggregate(Sum('power'))['power__sum']
+            state__state=True, room=room_id).aggregate(Sum('power'))['power__sum']
 
         serializer = CurrentStatsSerializer(
             data={

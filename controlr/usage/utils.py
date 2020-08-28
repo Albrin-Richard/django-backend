@@ -31,8 +31,14 @@ def fetch_device_usage_timeseries(frequency, start_ts, end_ts, device_ids, build
 def get_latest_device_states(building_id, device_ids, timestamp):
 
     if device_ids is not None:
+        if len(device_ids) == 1:
+            device_ids = f'({device_ids[0]})'
+        else:
+            device_ids = tuple(device_ids)
+
         latest_devices_states = Event.objects.raw(
-            f'SELECT id, device_id, timestamp FROM ( SELECT id, device_id, timestamp, ROW_NUMBER() OVER (PARTITION BY device_id ORDER BY timestamp DESC) AS rn FROM events_event WHERE timestamp <= \'{timestamp}\' AND device_id IN {tuple(device_ids)} GROUP BY id, device_id ) AS t WHERE rn <= 1 ORDER BY id, rn'
+            'SELECT id, device_id, timestamp FROM ( SELECT id, device_id, timestamp, ROW_NUMBER() OVER (PARTITION BY device_id ORDER BY timestamp DESC) AS rn FROM events_event WHERE timestamp <= \'{}\' AND device_id IN {} GROUP BY id, device_id ) AS t WHERE rn <= 1 ORDER BY id, rn'.format(
+                timestamp, device_ids)
         )
     else:
         latest_devices_states = Event.objects.raw(
@@ -161,7 +167,7 @@ def get_device_usage_timeseries(building_id, device_ids, start_ts, end_ts, frequ
             values = event.split('|')
             device_id = int(values[0])
             state_change = values[1] == 'true'
-            ts = datetime.strptime(values[2], '%Y-%m-%d %H:%M:%S+00')
+            ts = datetime.strptime(values[2], '%Y-%m-%d %H:%M:%S.%f+00')
 
             events_timeseries[datetime_itr]['events'].append({
                 'device_id': device_id,

@@ -20,8 +20,7 @@ from rest_framework.routers import DefaultRouter
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('v1/auth/', include('rest_auth.urls')),
-    path('v1/auth/registration/', include('rest_auth.registration.urls')),
-    path('v1/', include('controlr.accounts.urls')),
+    path('v1/auth/register/', include('rest_auth.registration.urls')),
     path('v1/buildings/', include('controlr.buildings.urls')),
     path('v1/buildings/<int:id>/', include('controlr.rooms.urls')),
     path('v1/buildings/<int:id>/', include('controlr.devices.urls')),

@@ -1,11 +1,13 @@
 from django.db import models
 from controlr.settings import MAX_ITEM_NAME_LENGTH, UNIQUE_ID_LENGTH
 # from controlr.devices.models import Device
+from controlr.accounts.models import User
 
 
 class Building(models.Model):
     name = models.CharField(max_length=MAX_ITEM_NAME_LENGTH)
-    owner = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    owner = models.ForeignKey(
+        User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name

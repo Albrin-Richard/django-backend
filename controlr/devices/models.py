@@ -24,15 +24,15 @@ class Device(models.Model):
     room = models.ForeignKey(
         Room,
         related_name='devices',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        null=True
     )
 
     building = models.ForeignKey(
         Building,
         related_name='devices',
         on_delete=models.CASCADE,
-        null=True,
-        blank=False
+        null=True
     )
 
     is_favorite = models.BooleanField(default=False)

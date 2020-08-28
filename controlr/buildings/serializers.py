@@ -7,7 +7,7 @@ class BuildingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Building
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'owner']
 
 
 class GroupSerializer(serializers.ModelSerializer):

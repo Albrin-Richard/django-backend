@@ -33,12 +33,14 @@ class DeviceShortSerializer(serializers.ModelSerializer):
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
-    room_group = serializers.CharField(
+    room_group_name = serializers.CharField(
         source='room.room_group', read_only=True)
+    room_name = serializers.CharField(
+        source='room.name', read_only=True)
     state = serializers.BooleanField(source='state.state', read_only=True)
     device_id = serializers.IntegerField(source='id')
 
     class Meta:
         model = Device
-        fields = ['device_id', 'name', 'room', 'state', 'room_group']
-        depth = 1
+        fields = ['device_id', 'name', 'room',
+                  'room_name', 'state', 'room_group_name']
