@@ -26,6 +26,7 @@ class DeviceSerializer(serializers.ModelSerializer):
 
 
 class DeviceShortSerializer(serializers.ModelSerializer):
+    state = serializers.BooleanField(source='state.state')
 
     class Meta:
         model = Device

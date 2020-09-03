@@ -51,10 +51,6 @@ def get_latest_device_states(building_id, device_ids, timestamp):
 def get_devices_usage(building_id, device_ids, start_ts, end_ts):
 
     # Add timezone information to the start and end timestamps
-    start_ts = datetime.strptime(
-        start_ts, '%Y-%m-%dT%H:%M:%S').astimezone(tz=pytz.utc)
-    end_ts = datetime.strptime(
-        end_ts, '%Y-%m-%dT%H:%M:%S').astimezone(tz=pytz.utc)
 
     events = Event.objects.filter(
         building_id=building_id,
@@ -121,11 +117,6 @@ def get_devices_usage(building_id, device_ids, start_ts, end_ts):
 
 
 def get_device_usage_timeseries(building_id, device_ids, start_ts, end_ts, frequency):
-    start_ts = datetime.strptime(
-        start_ts, '%Y-%m-%dT%H:%M:%S').astimezone(tz=pytz.utc)
-    end_ts = datetime.strptime(
-        end_ts, '%Y-%m-%dT%H:%M:%S').astimezone(tz=pytz.utc)
-
     total_minutes = get_total_minutes(frequency)
 
     events_timeseries = {}
@@ -258,3 +249,27 @@ def get_device_usage_timeseries(building_id, device_ids, start_ts, end_ts, frequ
         })
 
     return usage_timeseries_list
+
+
+def get_rooms_usage(building_id, room_ids, start_ts, end_ts):
+
+    rooms_usage = {}
+
+    for room_id in room_ids:
+
+        rooms_usage[room_id] = {
+            'usage': 0,
+            'runtime': 0
+        }
+
+        device_ids = Device.objects.filter(
+            room_id=room_id).values_list('id', flat=True)
+
+        devices_usage = get_devices_usage(
+            building_id=building_id, device_ids=device_ids, start_ts=start_ts, end_ts=end_ts)
+
+        for device_id, value in devices_usage.items():
+            rooms_usage[room_id]['usage'] += value['usage']
+            rooms_usage[room_id]['runtime'] += value['runtime']
+
+    return rooms_usage

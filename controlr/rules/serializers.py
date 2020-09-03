@@ -12,10 +12,11 @@ class TimerSerializer(serializers.ModelSerializer):
         source='device.room.room_group',
         read_only=True
     )
+    device_name = serializers.CharField(source='device.name', read_only=True)
 
     class Meta:
         model = Timer
-        fields = ['id', 'device', 'state_change', 'time_delta',
+        fields = ['id', 'device', 'device_name', 'state_change', 'time_delta',
                   'building', 'room_name', 'room_group_name']
         read_only_fields = ['building', 'device.room',
                             'room_name', 'room_group_name']

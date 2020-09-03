@@ -25,7 +25,8 @@ SECRET_KEY = '#*ubah8(^wgi^jgt%r&r+=fr2dw=e#azjv)_*sz##3iz&nskgb'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+]
 
 SITE_ID = 1
 # Application definition
@@ -49,6 +50,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'corsheaders',
 
     # Project apps
     'controlr.core',
@@ -62,6 +64,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'controlr.middlewares.TimezoneMiddleware',
@@ -166,6 +169,14 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'
 REST_AUTH_REGISTER_SERIALIZERS = {
     'REGISTER_SERIALIZER': 'controlr.accounts.serializers.UserSerializer',
 }
+
+# CORS
+CORS_ALLOWED_ORIGINS = [
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:3001'
+]
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Global Constants
 MAX_ITEM_NAME_LENGTH = 40

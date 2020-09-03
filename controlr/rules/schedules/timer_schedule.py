@@ -14,12 +14,12 @@ def switch_device_state(timer_id, device_id, state_change):
 
 
 def add_timer(timer_id, device_id, state_change, time_delta):
-
+    print('Timer Added')
     return timer_sched.add_job(
         switch_device_state,
         'date',
         run_date=timezone.now() + time_delta,
-        args=[timer_id, device_id, state_change],
+        args=[timer_id, device_id, state_change == 'true'],
         id=str(timer_id)
     )
 

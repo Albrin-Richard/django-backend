@@ -10,8 +10,11 @@ from controlr.rooms.models import Room
 
 
 class BuildingViewSet(viewsets.ModelViewSet):
-    queryset = Building.objects.all()
     serializer_class = BuildingSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return Building.objects.filter(owner=user)
 
 
 class GroupViewSet(viewsets.ModelViewSet):
@@ -49,7 +52,7 @@ class CurrentStatsView(APIView):
             state=True, device__building=building_id).count()
 
         current_power_usage = Device.objects.filter(
-            building=1, state=True).aggregate(Sum('power'))['power__sum']
+            building=building_id, state__state=True).aggregate(Sum('power'))['power__sum']
 
         num_rooms_total = Room.objects.filter(building=building_id).count()
 

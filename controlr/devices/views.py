@@ -47,14 +47,14 @@ class DeviceViewSet(viewsets.ModelViewSet):
     def switch(self, request, pk=None, id=None):
         current_state = DeviceState.objects.get(device=pk).state
 
-        if current_state == request.data['state']:
+        if current_state == request.data['state_change']:
             return Response({'message': 'failure'}, status=status.HTTP_400_BAD_REQUEST)
 
         else:
             state_object = DeviceState.objects.filter(
-                device=pk).update(state=request.data['state'])
+                device=pk).update(state=request.data['state_change'])
 
-        description = 'Device Switched On' if request.data['state'] else 'Device Switched Off'
+        description = 'Device Switched On' if request.data['state_change'] else 'Device Switched Off'
 
         event_signal.send(
             sender=self.__class__,
@@ -62,7 +62,7 @@ class DeviceViewSet(viewsets.ModelViewSet):
             type=Event.DEVICE_CREATED,
             description=description,
             device_id=pk,
-            state_change=request.data['state'],
+            state_change=request.data['state_change'],
             building_id=id
         )
         return Response({'message': 'success'}, status=status.HTTP_200_OK)

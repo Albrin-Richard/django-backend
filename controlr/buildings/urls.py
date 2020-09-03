@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from .views import BuildingViewSet, GroupViewSet, CurrentStatsView
 
 router = DefaultRouter()
-router.register(r'', BuildingViewSet)
+router.register(r'', BuildingViewSet, 'building')
 
 urlpatterns = [
     path('', include(router.urls)),
