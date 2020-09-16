@@ -13,12 +13,12 @@ def switch_device_state(timer_id, device_id, state_change):
         Timer.objects.get(id=timer_id).delete()
 
 
-def add_timer(timer_id, device_id, state_change, time_delta):
+def add_timer(timer_id, device_id, state_change, trigger_time):
     print('Timer Added')
     return timer_sched.add_job(
         switch_device_state,
         'date',
-        run_date=timezone.now() + time_delta,
+        run_date=trigger_time,
         args=[timer_id, device_id, state_change == 'true'],
         id=str(timer_id)
     )

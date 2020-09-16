@@ -14,7 +14,7 @@ class Timer(models.Model):
 
     state_change = models.BooleanField(default=True)
 
-    time_delta = models.DurationField()
+    trigger_time = models.DateTimeField(null=True)
 
     building = models.ForeignKey(
         Building,

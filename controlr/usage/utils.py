@@ -152,6 +152,10 @@ def get_device_usage_timeseries(building_id, device_ids, start_ts, end_ts, frequ
 
         value = device_usage_timeseries_dict[datetime_itr]
 
+        if (value is None):
+            datetime_itr += timedelta(**{f'{frequency}s': 1})
+            continue
+
         events = value.split(',')
 
         for event in events:
@@ -264,6 +268,9 @@ def get_rooms_usage(building_id, room_ids, start_ts, end_ts):
 
         device_ids = Device.objects.filter(
             room_id=room_id).values_list('id', flat=True)
+
+        if not device_ids:
+            continue
 
         devices_usage = get_devices_usage(
             building_id=building_id, device_ids=device_ids, start_ts=start_ts, end_ts=end_ts)

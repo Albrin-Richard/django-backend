@@ -8,15 +8,20 @@ from datetime import datetime
 from .schedules import timer_schedule
 from .schedules import schedule_schedule
 from controlr.buildings.models import Building
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import OrderingFilter
 
 
 class TimerViewSet(viewsets.ModelViewSet):
     queryset = Timer.objects.all()
     serializer_class = TimerSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ('device',)
 
     def list(self, request, *args, **kwargs):
         queryset = Timer.objects.filter(building_id=kwargs['id'])
-        serializer = self.get_serializer(queryset, many=True)
+        filtered_queryset = self.filter_queryset(queryset)
+        serializer = self.get_serializer(filtered_queryset, many=True)
 
         return Response(serializer.data)
 
@@ -29,13 +34,13 @@ class TimerViewSet(viewsets.ModelViewSet):
         building = Building.objects.get(id=kwargs['id'])
         timer = serializer.save(building=building)
 
-        time_delta = serializer.validated_data['time_delta']
+        trigger_time = serializer.validated_data['trigger_time']
         # timer_id = serializer.data['id']
         timer_schedule.add_timer(
             timer_id=timer.id,
             device_id=data['device'],
             state_change=data['state_change'],
-            time_delta=time_delta
+            trigger_time=trigger_time
         )
 
         headers = self.get_success_headers(serializer.data)
@@ -45,7 +50,7 @@ class TimerViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         self.perform_destroy(instance)
 
-        timer_schedule.remove_schedule(kwargs['pk'])
+        timer_schedule.remove_timer(kwargs['pk'])
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -53,10 +58,13 @@ class TimerViewSet(viewsets.ModelViewSet):
 class ScheduleViewSet(viewsets.ModelViewSet):
     queryset = Schedule.objects.all()
     serializer_class = ScheduleSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ('device',)
 
     def list(self, request, *args, **kwargs):
         queryset = Schedule.objects.filter(building_id=kwargs['id'])
-        serializer = self.get_serializer(queryset, many=True)
+        filtered_queryset = self.filter_queryset(queryset)
+        serializer = self.get_serializer(filtered_queryset, many=True)
 
         return Response(serializer.data)
 
@@ -94,9 +102,15 @@ class ScheduleViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def switch(self, request, pk=None, id=None):
-        Schedule.objects.filter(id=pk).update(state=request.data['state'])
+        current_state = Schedule.objects.get(id=pk).state
+        state_change = request.data['state_change']
+
+        if current_state == state_change:
+            return Response({'message': 'failure'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            Schedule.objects.filter(id=pk).update(state=state_change)
 
         schedule_schedule.switch_schedule_state(
-            schedule_id=pk, state_change=request.data['state'])
+            schedule_id=pk, state_change=state_change)
 
         return Response({'message': 'success'}, status=status.HTTP_200_OK)

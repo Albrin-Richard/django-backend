@@ -51,7 +51,7 @@ class DeviceViewSet(viewsets.ModelViewSet):
             return Response({'message': 'failure'}, status=status.HTTP_400_BAD_REQUEST)
 
         else:
-            state_object = DeviceState.objects.filter(
+            DeviceState.objects.filter(
                 device=pk).update(state=request.data['state_change'])
 
         description = 'Device Switched On' if request.data['state_change'] else 'Device Switched Off'
@@ -59,7 +59,7 @@ class DeviceViewSet(viewsets.ModelViewSet):
         event_signal.send(
             sender=self.__class__,
             timestamp=timezone.now(),
-            type=Event.DEVICE_CREATED,
+            type=Event.DEVICE_ON_MANUAL,
             description=description,
             device_id=pk,
             state_change=request.data['state_change'],

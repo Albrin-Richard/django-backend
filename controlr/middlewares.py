@@ -13,5 +13,5 @@ class TimezoneMiddleware:
         # else:
         #     timezone.deactivate()
 
-        # timezone.activate(pytz.timezone('Asia/Kolkata'))
+        timezone.activate(pytz.timezone('Asia/Kolkata'))
         return self.get_response(request)
