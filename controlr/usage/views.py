@@ -102,7 +102,6 @@ class DevicesUsageList(APIView):
     def post(self, request, *args, **kwargs):
         device_ids = request.data.get('device_ids')
         room_id = request.data.get('room_id')
-        print(request.data.get('start_ts'))
         group_id = request.data.get('group_id')
         start_ts = parse_datetime(request.data.get('start_ts'))
         end_ts = parse_datetime(request.data.get('end_ts'))
@@ -115,7 +114,6 @@ class DevicesUsageList(APIView):
                 device_ids = list(Group.objects.filter(
                     id=group_id).values_list('devices', flat=True))
 
-        print(device_ids)
         if room_id is not None and device_ids == [None]:
             return Response([], status=status.HTTP_200_OK)
 

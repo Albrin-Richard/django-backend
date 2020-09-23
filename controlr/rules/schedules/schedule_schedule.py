@@ -8,7 +8,7 @@ from ..models import Timer
 def add_schedule(schedule_id, device_id, state_change, days_of_week, hour, minute):
     days_of_week_str = ','.join(map(str, days_of_week))
 
-    return schedule_sched.add_job(
+    schedule_sched.add_job(
         switch_device_state,
         trigger='cron',
         day_of_week=days_of_week_str,
@@ -18,6 +18,8 @@ def add_schedule(schedule_id, device_id, state_change, days_of_week, hour, minut
         id=str(schedule_id)
     )
 
+    schedule_sched.print_jobs()
+
 
 def remove_schedule(schedule_id):
     schedule_id = str(schedule_id)
@@ -26,6 +28,7 @@ def remove_schedule(schedule_id):
 
 
 def switch_device_state(device_id, state_change):
+    print('Schedule triggered')
     DeviceState.objects.filter(device_id=device_id).update(state=state_change)
 
 

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Building, Group
 from controlr.devices.models import Device
+from controlr.devices.serializers import DeviceShortSerializer
 
 
 class BuildingSerializer(serializers.ModelSerializer):
@@ -10,7 +11,16 @@ class BuildingSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'owner']
 
 
-class GroupSerializer(serializers.ModelSerializer):
+class GroupDetailSerializer(serializers.ModelSerializer):
+    devices = DeviceShortSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = Group
+        fields = ['id', 'name', 'devices', 'building']
+        read_only_fields = ['building']
+
+
+class GroupListSerializer(serializers.ModelSerializer):
     num_devices = serializers.ReadOnlyField()
     devices = serializers.PrimaryKeyRelatedField(
         queryset=Device.objects.all(), many=True)

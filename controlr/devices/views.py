@@ -8,8 +8,11 @@ from rest_framework.response import Response
 from rest_framework import status
 from controlr.events.models import Event
 from controlr.signals.signals import event_signal
+from rest_framework.permissions import AllowAny
+from rest_framework.decorators import permission_classes
 
 
+@permission_classes((AllowAny, ))
 class DeviceViewSet(viewsets.ModelViewSet):
     queryset = Device.objects.all()
     serializer_class = DeviceSerializer

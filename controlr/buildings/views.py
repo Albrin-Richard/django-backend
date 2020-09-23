@@ -3,7 +3,7 @@ from rest_framework import viewsets, status, mixins
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Building, Group
-from .serializers import BuildingSerializer, GroupSerializer, CurrentStatsSerializer
+from .serializers import BuildingSerializer, GroupListSerializer, GroupDetailSerializer, CurrentStatsSerializer
 from django.db.models import Count, Sum
 from controlr.devices.models import Device, DeviceState
 from controlr.rooms.models import Room
@@ -19,7 +19,12 @@ class BuildingViewSet(viewsets.ModelViewSet):
 
 class GroupViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.all()
-    serializer_class = GroupSerializer
+
+    def get_serializer_class(self):
+        if self.action == 'list' or self.action == 'create':
+            return GroupListSerializer
+        else:
+            return GroupDetailSerializer
 
     def list(self, request, *args, **kwargs):
         queryset = Group.objects.filter(building=kwargs['id']).annotate(
@@ -34,6 +39,7 @@ class GroupViewSet(viewsets.ModelViewSet):
 
         building = Building.objects.get(id=kwargs['id'])
         serializer.save(building=building)
+        print(serializer.data)
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)

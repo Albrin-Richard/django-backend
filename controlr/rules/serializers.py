@@ -43,5 +43,5 @@ class ScheduleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Schedule
         fields = ['id', 'device', 'device_name', 'state', 'state_change',
-                  'time', 'days_of_week', 'building', 'room', 'room_name', 'room_group_name']
+                  'trigger_time', 'days_of_week', 'building', 'room', 'room_name', 'room_group_name']
         read_only_fields = ['building', 'room_name', 'room_group_name']

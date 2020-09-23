@@ -36,7 +36,8 @@ class Schedule(models.Model):
 
     state_change = models.BooleanField(default=True)
 
-    time = models.TimeField()
+    # DateTimeField is used instead of TimeField to ease timezone conversions
+    trigger_time = models.DateTimeField(null=True)
 
     days_of_week = ArrayField(
         models.IntegerField(),

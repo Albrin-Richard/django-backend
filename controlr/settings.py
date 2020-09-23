@@ -26,6 +26,10 @@ SECRET_KEY = '#*ubah8(^wgi^jgt%r&r+=fr2dw=e#azjv)_*sz##3iz&nskgb'
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    'billowing-wood-95382.pktriot.net',
+    'd5a0e95a05f7.ngrok.io'
 ]
 
 SITE_ID = 1
@@ -69,7 +73,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'controlr.middlewares.TimezoneMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -173,7 +177,8 @@ REST_AUTH_REGISTER_SERIALIZERS = {
 # CORS
 CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:3000',
-    'http://127.0.0.1:3001',
+    'http://billowing-wood-95382.pktriot.net',
+    'https://d5a0e95a05f7.ngrok.io'
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True

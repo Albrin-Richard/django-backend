@@ -35,7 +35,6 @@ class TimerViewSet(viewsets.ModelViewSet):
         timer = serializer.save(building=building)
 
         trigger_time = serializer.validated_data['trigger_time']
-        # timer_id = serializer.data['id']
         timer_schedule.add_timer(
             timer_id=timer.id,
             device_id=data['device'],
@@ -79,7 +78,8 @@ class ScheduleViewSet(viewsets.ModelViewSet):
 
         data = serializer.validated_data
 
-        time = data['time']
+        time = data['trigger_time']
+        print(schedule.id)
 
         schedule_schedule.add_schedule(
             schedule_id=schedule.id,

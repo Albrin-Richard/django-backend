@@ -1,7 +1,8 @@
 from apscheduler.schedulers.background import BackgroundScheduler
-
+from pytz import timezone
 timer_sched = BackgroundScheduler(daemon=True)
-schedule_sched = BackgroundScheduler(daemon=True)
+schedule_sched = BackgroundScheduler(
+    daemon=True, timezone=timezone('Asia/Calcutta'))
 
 timer_sched.add_jobstore(
     'redis',
